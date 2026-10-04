@@ -418,47 +418,5 @@ exposing **3 confidential patient PDF lab reports**.
 > 🔴 **Critical Finding:** Unauthorised access to confidential patient 
 > medical records was achieved through a combination of SQL injection 
 > vulnerability, weak credentials, and improper access controls.
-
-
----
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 > The goal is not just to find vulnerabilities — but to **think like an attacker** 
 > in order to **defend like a professional**.
