@@ -1,4 +1,4 @@
-# 🏥 Penetration Testing Report — Mediroza General Hospital - Week 4
+# 🏥 Penetration Testing Report - Mediroza General Hospital - Week 4
 
 ## 📌 Project Overview
 
