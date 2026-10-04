@@ -102,6 +102,8 @@ The first step was to probe the target's HTTP response headers using `curl`:
 curl -i https://medirozahospital.com/staff/
 ```
 
+![curl headers](screenshots/01_recon_curl_headers.png)
+
 **Findings:**
 | Header | Value | Significance |
 |--------|-------|--------------|
@@ -114,7 +116,48 @@ curl -i https://medirozahospital.com/staff/
 
 ---
 
-### 2. CMS Fingerprinting
+### 2. WhatWeb Fingerprinting
+
+```bash
+whatweb https://medirozahospital.com
+```
+
+![whatweb](screenshots/05_recon_whatweb_ip.png)
+
+**Findings:**
+- Server: **LiteSpeed**
+- Country: **United States**
+- IP: **199.188.201.16**
+- Technologies: **HTML5**
+
+---
+
+### 3. Robots.txt Analysis
+
+```bash
+curl -i https://medirozahospital.com/robots.txt
+```
+
+![robots.txt](screenshots/04_recon_whatweb_robots.png)
+
+**robots.txt revealed 3 hidden directories:**
+
+```
+User-agent: *
+Disallow: /patient/
+Disallow: /staff/
+Disallow: /old/
+```
+
+> ⚠️ **Finding:** robots.txt is intended to hide directories from 
+> search engines — but it actually **reveals sensitive paths** to 
+> any attacker who reads it. All 3 disallowed directories became 
+> immediate targets for further investigation.
+
+---
+
+
+### 4. CMS Fingerprinting
 
 Inspecting the page source revealed the CMS powering the application:
 
@@ -128,7 +171,8 @@ than commercial alternatives.
 
 ---
 
-### 3. Sitemap Enumeration
+
+### 5. Sitemap Enumeration
 
 ```bash
 curl -i https://medirozahospital.com/sitemap.xml
@@ -145,7 +189,7 @@ The sitemap revealed the following public pages:
 
 ---
 
-### 4. Directory Listing Discovery
+### 6. Directory Listing Discovery
 
 Probing common directories revealed that **directory listing was enabled** 
 on multiple paths — a critical misconfiguration that exposes the server's 
@@ -157,6 +201,15 @@ curl -s https://medirozahospital.com/old/
 curl -s https://medirozahospital.com/patient/
 ```
 
+**Directory Listing — /staff/ and /old/:**
+
+![staff and old directory](screenshots/02_recon_directory_listing_staff_old.png)
+
+**Directory Listing — /patient/:**
+
+![patient directory](screenshots/03_recon_directory_listing_patient.png)
+
+
 **Exposed Directories:**
 
 | Path | Directory Listing | Contents Found |
@@ -167,12 +220,14 @@ curl -s https://medirozahospital.com/patient/
 
 ---
 
-### 5. Sensitive File Discovery
+### 7. Sensitive File Discovery
 
 Inside `/old/`, a database backup file was found sitting fully exposed:
 
 ```bash
 curl -s -O https://medirozahospital.com/old/mediroza_db_backup_2019.sql
+grep -i "CREATE TABLE" mediroza_db_backup_2019.sql
+grep -A 50 "shareholders" mediroza_db_backup_2019.sql
 ```
 
 **File:** `mediroza_db_backup_2019.sql` (6.3KB)
@@ -190,9 +245,18 @@ Inspecting the file revealed:
 
 ---
 
-### 6. Entry Points Identified
+### 8. Entry Points Identified
 
-By the end of reconnaissance, the following entry
+y the end of reconnaissance, the following entry points were identified 
+for further testing:
+
+| Entry Point | Type | Priority |
+|-------------|------|----------|
+| `/staff/login.php` | Authentication form | High |
+| `/patient/login.php` | Authentication form | **Critical** |
+| `/patient/reports/` | File directory (403) | High |
+| `/patient/download.php` | File download script | High |
+| `/old/mediroza_db_backup_2019.sql` | Exposed backup file | **Critical** |
 
 
 
