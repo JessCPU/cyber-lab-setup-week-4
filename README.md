@@ -102,7 +102,7 @@ The first step was to probe the target's HTTP response headers using `curl`:
 curl -i https://medirozahospital.com/staff/
 ```
 
-![curl headers](screenshots/01_recon_curl_headers.png)
+![curl headers](screenshots/recon_curl_headers.png)
 
 **Findings:**
 | Header | Value | Significance |
@@ -122,7 +122,7 @@ curl -i https://medirozahospital.com/staff/
 whatweb https://medirozahospital.com
 ```
 
-![whatweb](screenshots/05_recon_whatweb_ip.png)
+![whatweb](screenshots/recon_whatweb_ip.png)
 
 **Findings:**
 - Server: **LiteSpeed**
@@ -138,7 +138,7 @@ whatweb https://medirozahospital.com
 curl -i https://medirozahospital.com/robots.txt
 ```
 
-![robots.txt](screenshots/04_recon_whatweb_robots.png)
+![robots.txt](screenshots/recon_whatweb_robots.png)
 
 **robots.txt revealed 3 hidden directories:**
 
@@ -203,11 +203,11 @@ curl -s https://medirozahospital.com/patient/
 
 **Directory Listing — /staff/ and /old/:**
 
-![staff and old directory](screenshots/02_recon_directory_listing_staff_old.png)
+![staff and old directory](screenshots/recon_directory_listing_staff_old.png)
 
 **Directory Listing — /patient/:**
 
-![patient directory](screenshots/03_recon_directory_listing_patient.png)
+![patient directory](screenshots/recon_directory_listing_patient.png)
 
 
 **Exposed Directories:**
