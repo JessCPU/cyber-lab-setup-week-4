@@ -102,7 +102,7 @@ The first step was to probe the target's HTTP response headers using `curl`:
 curl -i https://medirozahospital.com/staff/
 ```
 
-![curl headers](screenshots/recon_curl_headers.png)
+![curl headers](images/recon_curl_headers.png)
 
 **Findings:**
 | Header | Value | Significance |
@@ -122,7 +122,7 @@ curl -i https://medirozahospital.com/staff/
 whatweb https://medirozahospital.com
 ```
 
-![whatweb](screenshots/recon_whatweb_ip.png)
+![whatweb](images/recon_whatweb_ip.png)
 
 **Findings:**
 - Server: **LiteSpeed**
@@ -138,7 +138,7 @@ whatweb https://medirozahospital.com
 curl -i https://medirozahospital.com/robots.txt
 ```
 
-![robots.txt](screenshots/recon_whatweb_robots.png)
+![robots.txt](images/recon_whatweb_robots.png)
 
 **robots.txt revealed 3 hidden directories:**
 
@@ -203,11 +203,11 @@ curl -s https://medirozahospital.com/patient/
 
 **Directory Listing — /staff/ and /old/:**
 
-![staff and old directory](screenshots/recon_directory_listing_staff_old.png)
+![staff and old directory](images/recon_directory_listing_staff_old.png)
 
 **Directory Listing — /patient/:**
 
-![patient directory](screenshots/recon_directory_listing_patient.png)
+![patient directory](images/recon_directory_listing_patient.png)
 
 
 **Exposed Directories:**
@@ -300,7 +300,7 @@ check the manual that corresponds to your MySQL server version
 for the right syntax to use near '' at line 1
 ```
 
-![mysql error](screenshots/m1_mysql_error.png)
+![mysql error](images/m1_mysql_error.png)
 
 
 > 🔴 **Critical Finding:** The application is vulnerable to SQL injection AND 
@@ -319,7 +319,7 @@ existed in the database:
 | `randomuser` | "Username not found" | User does not exist |
 | `admin` | "Incorrect password" | **User EXISTS** |
 
-![username enumeration](screenshots/m1_username_enumeration.png)
+![username enumeration](images/m1_username_enumeration.png)
 
 
 > ℹ️ This confirmed `admin` as a valid username and allowed targeted 
@@ -352,7 +352,7 @@ login: admin  password: Spring2017
 1 of 1 target successfully completed, 1 valid password found
 ```
 
-![hydra result](screenshots/m1_hydra_result.png)
+![hydra result](images/m1_hydra_result.png)
 
 
 > ✅ **Credentials found:** `admin` / `Spring2017`
@@ -371,7 +371,7 @@ on the patient portal:
 | **Portal URL** | `https://medirozahospital.com/patient/portal.php` |
 
 
-![portal access](screenshots/m1_portal_access.png)
+![portal access](images/m1_portal_access.png)
 
 
 ---
@@ -457,7 +457,7 @@ curl -s "https://medirozahospital.com/patient/download.php?id=3" \
 -b cookies.txt -A "Mozilla/5.0" -o patient_report_3.pdf
 ```
 
-![pdf downloads](screenshots/m2_pdfs_downloaded.png)
+![pdf downloads](images/m2_pdfs_downloaded.png)
 
 ---
 
@@ -488,7 +488,7 @@ qpdf --password='password' --decrypt patient_report_2.pdf report2_open.pdf
 qpdf --password='!@#$%^&' --decrypt patient_report_3.pdf report3_open.pdf
 ```
 
-![decrypted reports](screenshots/m2_decrypted.png)
+![decrypted reports](images/m2_decrypted.png)
 
 ---
 
@@ -538,7 +538,7 @@ qpdf --password='!@#$%^&' --decrypt patient_report_3.pdf report3_open.pdf
 exiftool report3_open.pdf
 ```
 
-![exiftool metadata](screenshots/m3_exiftool.png)
+![exiftool metadata](images/m3_exiftool.png)
 
 **Key Metadata Findings:**
 
