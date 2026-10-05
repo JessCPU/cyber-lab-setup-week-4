@@ -662,18 +662,18 @@ performed exclusively within the agreed scope of `https://medirozahospital.com`.
 ### 🛠️ Tools & Resources Breakdown
 
 #### Software & Command-Line Utilities
-- **curl**: HTTP header analysis, directory probing, and file extraction.
-- **WhatWeb**: Fingerprinting web server software, host IP, and runtime versions.
-- **THC-Hydra**: Authentication brute-force attacks against the patient login portal.
-- **sqlmap**: Automated vulnerability verification for SQL injection entry points.
-- **qpdf**: Decryption and password stripping for protected PDF deliverables.
-- **ExifTool**: Forensic metadata inspection of extracted patient records.
-- **Burp Suite**: Interception, inspection, and manual replay of web requests.
-- **Browser Developer Tools**: Session cookie evaluation and form behavior auditing.
+- **[curl](https://curl.se/)**: HTTP header analysis, directory probing, and file extraction.
+- **[WhatWeb](https://github.com/urbanadventurer/WhatWeb)**: Fingerprinting web server software, host IP, and runtime versions.
+- **[THC-Hydra](https://github.com/vanhauser-thc/thc-hydra)**: Authentication brute-force attacks against the patient login portal.
+- **[sqlmap](https://sqlmap.org/)**: Automated vulnerability verification for SQL injection entry points.
+- **[qpdf](https://github.com/qpdf/qpdf)**: Decryption and password stripping for protected PDF deliverables.
+- **[ExifTool](https://exiftool.org/)**: Forensic metadata inspection of extracted patient records.
+- **[Burp Suite](https://portswigger.net/burp)**: Interception, inspection, and manual replay of web requests.
+- **[Browser Developer Tools](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools)**: Session cookie evaluation and form behavior auditing.
 
 #### Wordlists & External Utilities
-- **FastTrack Wordlist** (`/usr/share/wordlists/fasttrack.txt`): Optimized wordlist used with single-threaded rate limiting.
-- **NetworkWalks Hash Calculator & Password Cracker**: Decryption utility for password-locked PDF reports.
+- **[FastTrack Wordlist](https://gitlab.com/kalilinux/packages/set/-/blob/master/src/fasttrack/wordlist.txt)** (`/usr/share/wordlists/fasttrack.txt`): Optimized wordlist used with single-threaded rate limiting.
+- **[NetworkWalks Hash Calculator & Password Cracker](https://networkwalks.com/)**: Decryption utility for password-locked PDF reports.
 
 
 ---
@@ -689,9 +689,4 @@ Computer Science Student
 
 
 ---
-
-
-
-
-
 
