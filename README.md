@@ -300,6 +300,9 @@ check the manual that corresponds to your MySQL server version
 for the right syntax to use near '' at line 1
 ```
 
+![mysql error](screenshots/m1_mysql_error.png)
+
+
 > 🔴 **Critical Finding:** The application is vulnerable to SQL injection AND 
 > leaks raw MySQL error messages — confirming both SQLi and error disclosure 
 > vulnerabilities simultaneously.
@@ -315,6 +318,9 @@ existed in the database:
 |-------|----------|---------|
 | `randomuser` | "Username not found" | User does not exist |
 | `admin` | "Incorrect password" | **User EXISTS** |
+
+![username enumeration](screenshots/m1_username_enumeration.png)
+
 
 > ℹ️ This confirmed `admin` as a valid username and allowed targeted 
 > password attacks rather than credential stuffing.
@@ -346,6 +352,9 @@ login: admin  password: Spring2017
 1 of 1 target successfully completed, 1 valid password found
 ```
 
+![hydra result](screenshots/m1_hydra_result.png)
+
+
 > ✅ **Credentials found:** `admin` / `Spring2017`
 
 ---
@@ -360,6 +369,10 @@ on the patient portal:
 | **Username** | `admin` |
 | **Password** | `Spring2017` |
 | **Portal URL** | `https://medirozahospital.com/patient/portal.php` |
+
+
+![portal access](screenshots/m1_portal_access.png)
+
 
 ---
 
@@ -409,7 +422,7 @@ grep -A 50 "shareholders" mediroza_db_backup_2019.sql
 
 ---
 
-### 3. Patient Lab Report Retrieval — M1
+### 🔓 M1 — Patient Lab Report Retrieval 
 
 After successfully authenticating to the patient portal with `admin` / 
 `Spring2017`, the restricted `/patient/reports/` directory became accessible, 
@@ -420,3 +433,239 @@ exposing **3 confidential patient PDF lab reports**.
 > vulnerability, weak credentials, and improper access controls.
 > The goal is not just to find vulnerabilities — but to **think like an attacker** 
 > in order to **defend like a professional**.
+
+
+---
+
+## 🔓 M2 — Cracking the Encrypted Lab Reports
+
+All 3 downloaded PDF lab reports were password protected. The passwords 
+were cracked using the Networkwalks hash calculator and password cracker tools.
+
+---
+
+### Step 1 — Download the Reports
+
+```bash
+curl -s "https://medirozahospital.com/patient/download.php?id=1" \
+-b cookies.txt -A "Mozilla/5.0" -o patient_report_1.pdf
+
+curl -s "https://medirozahospital.com/patient/download.php?id=2" \
+-b cookies.txt -A "Mozilla/5.0" -o patient_report_2.pdf
+
+curl -s "https://medirozahospital.com/patient/download.php?id=3" \
+-b cookies.txt -A "Mozilla/5.0" -o patient_report_3.pdf
+```
+
+![pdf downloads](screenshots/m2_pdfs_downloaded.png)
+
+---
+
+### Step 2 — Crack the Passwords
+
+Each PDF was uploaded to the Networkwalks hash calculator and password 
+cracker to retrieve the encryption passwords.
+
+**Results:**
+
+| Report | Patient | Password |
+|--------|---------|----------|
+| `patient_report_1.pdf` | S. Dlamini | `123456` |
+| `patient_report_2.pdf` | P. Reddy | `password` |
+| `patient_report_3.pdf` | E. Thompson | `!@#$%^&` |
+
+> 🔴 **Critical Finding:** All 3 reports used extremely weak, 
+> commonly known passwords — providing virtually no real protection 
+> for confidential patient medical data.
+
+---
+
+### Step 3 — Decrypt the Reports
+
+```bash
+qpdf --password='123456' --decrypt patient_report_1.pdf report1_open.pdf
+qpdf --password='password' --decrypt patient_report_2.pdf report2_open.pdf
+qpdf --password='!@#$%^&' --decrypt patient_report_3.pdf report3_open.pdf
+```
+
+![decrypted reports](screenshots/m2_decrypted.png)
+
+---
+
+## 📊 M3 — Staff Salaries, Shareholder Details & PDF Metadata
+
+---
+
+### Part 1 — Staff Salaries & Shareholder Data
+
+The exposed database backup `/old/mediroza_db_backup_2019.sql` contained 
+full staff salary and shareholder records.
+
+**Staff Salaries:**
+
+| Name | Role | Monthly Salary (ZAR) |
+|------|------|---------------------|
+| Dr. Johan van der Merwe | Medical Director | R 160,000 |
+| Sarah Botha | Chief Financial Officer | R 152,000 |
+| Dr. Rajesh Naidoo | Chief Pathologist | R 138,000 |
+| Dr. Anita Naicker | Consultant Cardiologist | R 132,000 |
+| Dr. Ahmed Kara | Consultant Physician | R 128,000 |
+| Dr. Yusuf Cassim | Senior Registrar | R 74,000 |
+
+**Shareholder Details:**
+
+| Shareholder | Share % | Shares Held | Class |
+|-------------|---------|-------------|-------|
+| Dr. Rajesh Naidoo | 18.0% | 180,000 | Ordinary |
+| Cedar Health Holdings (Pty) Ltd | 15.0% | 150,000 | Ordinary |
+| Dr. Johan van der Merwe | 12.0% | 120,000 | Ordinary |
+| Reddy Family Trust | 11.0% | 110,000 | Ordinary |
+| Thabo Molefe | 10.0% | 100,000 | Ordinary |
+| Sarah Botha | 9.0% | 90,000 | Ordinary |
+| Dr. Ahmed Kara | 8.0% | 80,000 | Preferential |
+| Naledi Zulu | 7.0% | 70,000 | Ordinary |
+| Michael Roberts | 6.0% | 60,000 | Ordinary |
+| Dr. Vikram Chetty | 4.0% | 40,000 | Preferential |
+
+---
+
+### Part 2 — PDF Metadata Analysis
+
+Report 3 was decrypted and analysed using exiftool:
+
+```bash
+qpdf --password='!@#$%^&' --decrypt patient_report_3.pdf report3_open.pdf
+exiftool report3_open.pdf
+```
+
+![exiftool metadata](screenshots/m3_exiftool.png)
+
+**Key Metadata Findings:**
+
+| Field | Value | Significance |
+|-------|-------|--------------|
+| `Author` | `j.malik` | IT Systems Administrator left internal comment in patient file |
+| `Comments` | `DB backup moved to /old before site migration, do not delete` | Directly revealed the location of the exposed database backup |
+| `Creator` | `Mediroza CMS 1.4.2` | CMS version exposed in metadata |
+| `Title` | `Pathology Report — E. Thompson` | Confirms confidential patient data exposure |
+
+> 🔴 **Critical Finding:** Internal staff comments embedded in 
+> patient-facing PDF metadata directly revealed the location of 
+> the exposed database backup at `/old/`. This created a 
+> complete attack chain:
+>
+> `PDF metadata → /old/ directory → SQL backup → 
+> staff salaries + shareholder data`
+
+
+---
+
+
+## 📂 Repository Structure
+
+
+
+
+
+---
+
+
+## ⚠️ Challenges Encountered
+
+
+
+### 1. Bot Detection & WAF Interference
+
+The target had active bot detection that blocked automated tools. `curl` 
+requests returned JavaScript challenge pages instead of real content, and 
+sqlmap was blocked **98 times** by the WAF. All tools required browser-like 
+User-Agent strings to bypass detection.
+
+---
+
+### 2. Hydra False Positives
+
+The most time-consuming challenge was Hydra reporting **16 false positive 
+passwords** during brute-forcing. The WAF was blocking rapid requests and 
+returning unexpected pages that Hydra misread as successful logins.
+
+**Resolution:** Switched to `fasttrack.txt` with `-t 1` (single thread) 
+and `-w 5` (5 second wait) — this eliminated false positives and correctly 
+identified the real password: `P@55w0rd!`
+
+---
+
+### 3. SQL Injection Limitations
+
+The app used `mysqli_real_escape_string()` which broke most classic SQLi 
+payloads. The app also ran two separate queries for username and password, 
+complicating injection attempts.
+
+**Resolution:** Switched to username enumeration via error messages, then 
+used Hydra to brute-force the confirmed `admin` account.
+
+---
+
+### 4. Session Expiry Issues
+
+Captured `PHPSESSID` cookies expired within seconds, making curl-based 
+session reuse impossible. The browser repeatedly redirected back to login.
+
+**Resolution:** Brute-forced the real credentials instead of relying on 
+SQLi session bypass, creating a stable authenticated session.
+
+
+---
+
+
+
+## ⚖️ Ethical & Security Notice
+
+This penetration test was conducted under **explicit written authorisation** 
+from Networkwalks as part of the B083 training programme. All testing was 
+performed exclusively within the agreed scope of `https://medirozahospital.com`.
+
+**The following rules were strictly observed throughout:**
+
+- ✅ No testing outside the agreed target domain
+- ✅ No denial of service attacks performed
+- ✅ No social engineering techniques used
+- ✅ All findings reported responsibly to the authorising party
+- ✅ No data was retained beyond what was necessary for reporting
+
+> ⚠️ The techniques demonstrated in this report are for **educational 
+> purposes only**. Performing these actions against any system without 
+> explicit written permission is illegal under the Computer Misuse Act 
+> and equivalent legislation worldwide.
+
+
+---
+
+
+### 🛠️ Tools & Resources Breakdown
+
+#### Software & Command-Line Utilities
+- **curl**: HTTP header analysis, directory probing, and file extraction.
+- **WhatWeb**: Fingerprinting web server software, host IP, and runtime versions.
+- **THC-Hydra**: Authentication brute-force attacks against the patient login portal.
+- **sqlmap**: Automated vulnerability verification for SQL injection entry points.
+- **qpdf**: Decryption and password stripping for protected PDF deliverables.
+- **ExifTool**: Forensic metadata inspection of extracted patient records.
+- **Burp Suite**: Interception, inspection, and manual replay of web requests.
+- **Browser Developer Tools**: Session cookie evaluation and form behavior auditing.
+
+#### Wordlists & External Utilities
+- **FastTrack Wordlist** (`/usr/share/wordlists/fasttrack.txt`): Optimized wordlist used with single-threaded rate limiting.
+- **NetworkWalks Hash Calculator & Password Cracker**: Decryption utility for password-locked PDF reports.
+
+
+---
+
+
+## 👤 Author
+
+
+
+
+
+
