@@ -564,6 +564,23 @@ exiftool report3_open.pdf
 ## 📂 Repository Structure
 
 
+cyber-lab-setup-week-4/
+├── images/
+│   ├── .gitkeep
+│   ├── m1_hydra_result.png
+│   ├── m1_mysql_error.png
+│   ├── m1_portal_access.png
+│   ├── m1_username_enumeration.png
+│   ├── m2_decrypted.png
+│   ├── m2_pdfs_downloaded.png
+│   ├── m3_exiftool.png
+│   ├── recon_curl_headers.png
+│   ├── recon_directory_listing_patient.png
+│   ├── recon_directory_listing_staff_old.png
+│   ├── recon_whatweb_ip.png
+│   └── recon_whatweb_robots.png
+└── README.md
+
 
 
 
@@ -663,6 +680,15 @@ performed exclusively within the agreed scope of `https://medirozahospital.com`.
 
 
 ## 👤 Author
+
+
+**Jessica Mordaa**  
+Computer Science Student
+
+**LinkedIn:** [https://www.linkedin.com/in/jessica-m-63b958321](https://www.linkedin.com/in/jessica-m-63b958321?utm_source=share_via&utm_content=profile&utm_medium=member_android)
+
+
+---
 
 
 
