@@ -564,6 +564,7 @@ exiftool report3_open.pdf
 ## 📂 Repository Structure
 
 
+```text
 cyber-lab-setup-week-4/
 ├── images/
 │   ├── .gitkeep
@@ -580,7 +581,7 @@ cyber-lab-setup-week-4/
 │   ├── recon_whatweb_ip.png
 │   └── recon_whatweb_robots.png
 └── README.md
-
+```
 
 
 
